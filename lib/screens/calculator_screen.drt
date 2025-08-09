@@ -1,0 +1,122 @@
+import 'package:flutter/material.dart';
+import '../widgets/calculator_button.dart';
+import '../utils/calculator_logic.dart';
+
+class CalculatorScreen extends StatefulWidget {
+  const CalculatorScreen({super.key});
+
+  @override
+  _CalculatorScreenState createState() => _CalculatorScreenState();
+}
+
+class _CalculatorScreenState extends State<CalculatorScreen> {
+  String userInput = "";
+  String result = "0";
+
+  final List<String> buttons = [
+    'C', 'DEL', '%', '/',
+    '7', '8', '9', 'x',
+    '4', '5', '6', '-',
+    '1', '2', '3', '+',
+    '00', '0', '.', '=',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Calculator'),
+        centerTitle: true,
+      ),
+      backgroundColor: Colors.black,
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.bottomRight,
+              child: SingleChildScrollView(
+                reverse: true,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      userInput,
+                      style: const TextStyle(fontSize: 28, color: Colors.white70),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      result,
+                      style: const TextStyle(fontSize: 48, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: GridView.builder(
+              itemCount: buttons.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+              ),
+              itemBuilder: (context, index) {
+                if (buttons[index] == 'C') {
+                  return CalculatorButton(
+                    text: buttons[index],
+                    color: Colors.redAccent,
+                    onTap: () {
+                      setState(() {
+                        userInput = '';
+                        result = '0';
+                      });
+                    },
+                  );
+                } else if (buttons[index] == 'DEL') {
+                  return CalculatorButton(
+                    text: buttons[index],
+                    color: Colors.blue,
+                    onTap: () {
+                      setState(() {
+                        if (userInput.isNotEmpty) {
+                          userInput = userInput.substring(0, userInput.length - 1);
+                        }
+                      });
+                    },
+                  );
+                } else if (buttons[index] == '=') {
+                  return CalculatorButton(
+                    text: buttons[index],
+                    color: Colors.green,
+                    onTap: () {
+                      setState(() {
+                        result = calculateResult(userInput);
+                      });
+                    },
+                  );
+                } else {
+                  return CalculatorButton(
+                    text: buttons[index],
+                    color: isOperator(buttons[index])
+                        ? Colors.orange
+                        : Colors.grey[850],
+                    onTap: () {
+                      setState(() {
+                        userInput += buttons[index];
+                      });
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool isOperator(String x) {
+    return ['%', '/', 'x', '-', '+', '='].contains(x);
+  }
+}
